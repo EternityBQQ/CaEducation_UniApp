@@ -1,0 +1,14 @@
+/**
+ * 网络请求地址配置
+ */
+let url_config = "";
+
+if (process.env.NODE_ENV === 'development') {
+	// 开发环境
+	url_config = 'http://localhost:8089/'
+} else {
+	// 生产环境
+	url_config = 'http://24t592x186.wicp.vip/'
+}
+
+export default url_config;

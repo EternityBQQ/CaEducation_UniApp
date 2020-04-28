@@ -138,7 +138,7 @@
 				this.listTouchDirection = e.touches[0].pageX - this.listTouchStart > 0 ? 'right' : 'left';
 				var flag = false;
 				var direction = null;
-				// TODO 禁止首页和末页的滑动穿透
+				// 禁止首页和末页的滑动穿透 =>待完善
 				if (this.currentIndex == 0) {
 					direction = "right";
 				} else if (this.currentIndex == 3) {

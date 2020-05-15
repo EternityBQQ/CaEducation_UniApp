@@ -124,7 +124,18 @@
 			this.articleData = this.articleData.concat(currentData);
 		},
 		methods: {
-			
+			/*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
+			upCallback(page) {
+				var curPageData = this.courseList || []
+				curPageData.forEach(item => {
+					
+				});
+				this.mescroll.endByPage(curPageData.length, curPageData.pages);
+				this.dataList = this.dataList.concat(curPageData);
+				if (this.dataList.length < 1) {
+					this.mescroll.showEmpty()
+				}
+			},
 		},
 	}
 </script>

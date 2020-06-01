@@ -12,21 +12,21 @@
 				<view class="cu-item shadow">
 					<view class="cu-list menu-avatar">
 						<view class="cu-item">
-							<view class="cu-avatar round lg" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg);"></view>
+							<view class="cu-avatar round lg" :style="'background-image:url(' + hotPost.head_icon + ');'" />
 							<view class="content flex-sub">
-								<view>凯尔</view>
+								<view>{{hotPost.username}}</view>
 								<view class="text-gray text-sm flex justify-between">
-									2019年12月3日
+									{{hotPost.public_time}}
 								</view>
 							</view>
 						</view>
 					</view>
 					<view class="text-content">
-						折磨生出苦难，苦难又会加剧折磨，凡间这无穷的循环，将有我来终结！
+						{{hotPost.post_content}}
 					</view>
 					<view class="grid flex-sub padding-lr" :class="isCard?'col-3 grid-square':'col-1'">
-						<view class="bg-img" :class="isCard?'':'only-img'" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg);"
-						 v-for="(item,index) in isCard?9:1" :key="index">
+						<view class="bg-img" :class="isCard?'':'only-img'" :style="'background-image:url(' + hotPost.post_images[0] + ');'"
+							v-for="(item,index) in isCard?9:1" :key="index">
 						</view>
 					</view>
 					<view class="text-gray text-sm text-right padding">
@@ -87,12 +87,11 @@
 			<!--论坛文章-->
 			<view class="cu-card article" :class="isCard?'no-card':''" v-for="(item, index) in articleData" :key="index">
 				<view class="cu-item shadow">
-					<view class="title"><view class="text-cut">无意者 烈火焚身;以正义的烈火拔出黑暗。我有自己的正义，见证至高的烈火吧。</view></view>
+					<view class="title"><view class="text-cut">{{item.title}}</view></view>
 					<view class="content">
-						<image src="https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg"
-						 mode="aspectFill"></image>
+						<image :src="item.imgUrl[0]" mode="aspectFill" />
 						<view class="desc">
-							<view class="text-content"> 折磨生出苦难，苦难又会加剧折磨，凡间这无穷的循环，将有我来终结！真正的恩典因不完整而美丽，因情感而真诚，因脆弱而自由！</view>
+							<view class="text-content">{{item.post_content}}</view>
 							<view>
 								<view class="cu-tag bg-red light sm round">正义天使</view>
 								<view class="cu-tag bg-green light sm round">史诗</view>
@@ -113,8 +112,39 @@
 		data() {
 			return {
 				isCard: true,
+				hotPost: null,
 				articleData: []
 			}
+		},
+		created() {
+			// 初始化社区交流信息模块
+			this.$request.sendResuest({
+				url: "education/communityTab",
+				method: "GET",
+				data: {
+					"pageDataSize": 10
+				},
+				hideLoading: true,
+				success: (data) => {
+					let pageData = data;
+					uni.setStorage({
+						key: 'education/communityTab?token=community',
+						data: pageData,
+						success: () => {
+							console.log("社区交流模块数据存储成功!");
+						}
+					})
+				}
+			}, "/pages/main/main.vue");
+			// 从本地获取缓存数据
+			uni.getStorage({
+				key: "education/communityTab?token=community",
+				success: res => {
+					// 封装数据
+					this.hotPost = res.data.hotPost,
+					this.articleData = res.data.posts
+				}
+			})
 		},
 		mounted() {
 			var currentData = [];
@@ -126,7 +156,7 @@
 		methods: {
 			/*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
 			upCallback(page) {
-				var curPageData = this.courseList || []
+				var curPageData = this.articleData || []
 				curPageData.forEach(item => {
 					
 				});

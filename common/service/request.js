@@ -53,77 +53,61 @@ const sendResuest = (params, backPage) => {
 		method = 'GET';
 		header = {'content-type' : "application/json"};
 	}
-	
-	uni.request({
-		url: requestUrl,
-		method: method,
-		header:header,
-		data:data,
-		success: res => {
-			if (res.statusCode && res.statusCode != 200) {
-				// 请求出错
-				uni.showModal({
-					content:"请求失败,错误码:" + res.statusCode
-				});
-				return;
-			}
-			
-			// 返回结果码code判断:0成功,1错误,-1未登录(未绑定/失效/被解绑)
-			if (!res.data.status) {
-				let code = res.data.status;
-				if (code == '-1') {
-					// 重新登录
-					/* uni.navigateTo({
-						url: backPage
-					}) */
-					return;
-				} else if (code != '0') {
+	new Promise(function(resolve, reject) {
+		uni.request({
+			url: requestUrl,
+			method: method,
+			header:header,
+			data:data,
+			success: res => {
+				if (res.statusCode && res.statusCode != 200) {
+					// 请求出错
 					uni.showModal({
-						showCancel:false,
-						content:"" + res.data.msg
+						content:"请求失败,错误码:" + res.statusCode
 					});
 					return;
 				}
-			} else {
+				
+				// 返回结果码code判断:0成功,1错误,-1未登录(未绑定/失效/被解绑)
+				if (!res.data.status) {
+					let code = res.data.status;
+					if (code == '-1') {
+						// 重新登录
+						/* uni.navigateTo({
+							url: backPage
+						}) */
+						return;
+					} else if (code != '0') {
+						uni.showModal({
+							showCancel:false,
+							content:"" + res.data.msg
+						});
+						return;
+					}
+				} else {
+					uni.showModal({
+						showCancel:false,
+						content: "No resultCode: " + res.data.msg
+					});
+					return;
+				}
+				typeof params.success == "function" && params.success(res.data.responseData);
+			},
+			fail: (e) => {
 				uni.showModal({
-					showCancel:false,
-					content: "No resultCode: " + res.data.msg
+					content:"" + e.errMsg
 				});
+				typeof params.fail == "function" && params.fail(e.data);
+			},
+			complete: () => {
+				if (!hideLoading) {
+					uni.hideLoading();
+				}
+				typeof params.complete == "function" && params.complete();
 				return;
 			}
-			typeof params.success == "function" && params.success(res.data.responseData);
-		},
-		fail: (e) => {
-			uni.showModal({
-				content:"" + e.errMsg
-			});
-			typeof params.fail == "function" && params.fail(e.data);
-		},
-		complete: () => {
-			if (!hideLoading) {
-				uni.hideLoading();
-			}
-			typeof params.complete == "function" && params.complete();
-			return;
-		}
+		});
 	});
 }
 
-// 同步请求
-const sendSyncRequest = (params) => {
-	var requestUrl = baseUrl + params.url;
-	return new Promise((resolve, reject) => {
-		uni.request({
-			url: requestUrl,
-			success: (res) => {
-				console.log(res.data.responseData)
-				resolve("success");
-			},
-			fail: (err) => {
-				reject('error')
-			}
-		})
-	});
-}
-
-export default {sendResuest, sendSyncRequest};
+export default {sendResuest};

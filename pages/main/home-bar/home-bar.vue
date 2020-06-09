@@ -65,36 +65,40 @@
 		created() {
 			// 初始化towerSwiper 传已有的数组名即可
 			this.TowerSwiper('swiperList');
-			// 初始化轮播图列表
-			this.$request.sendResuest({
-				url: "education/mediaOutPut",
-				method: "GET",
-				data: {
-					token: ''
-				},
-				hideLoading: true,
-				success: data => {
-					let list = data;
-					uni.setStorage({
-						key:'education/mediaOutPut?token=home',
-						data: list,
-						success:() => {
-							console.log("首页数据存取成功");
-						}
-					});
-				}
-			}, "/pages/main/main.vue");
-			uni.getStorage({
-				key: 'education/mediaOutPut?token=home',
-				success: res => {
-					// 封装数据
-					this.swiperList = res.data.carouselList;
-					this.cuIconList = res.data.categoryTag;
-					this.courseList = res.data.courseList;
-				}
-			})
+			this.initPageData();
 		},
 		methods: {
+			initPageData: async function() {
+				// 初始化轮播图列表
+				this.$request.sendResuest({
+					url: "education/mediaOutPut",
+					method: "GET",
+					data: {
+						token: ''
+					},
+					hideLoading: true,
+					success: data => {
+						let list = data;
+						uni.setStorage({
+							key:'education/mediaOutPut?token=home',
+							data: list,
+							success:() => {
+								console.log("首页数据获取成功");
+							}
+						});
+					}
+				}, "/pages/main/main.vue");
+				uni.getStorage({
+					key: 'education/mediaOutPut?token=home',
+					success: res => {
+						// 封装数据
+						this.swiperList = res.data.carouselList;
+						this.cuIconList = res.data.categoryTag;
+						this.courseList = res.data.courseList;
+						console.log("首页数据存取成功");
+					}
+				});
+			},
 			DotStyle(e) {
 				this.dotStyle = e.detail.value
 			},
@@ -127,7 +131,6 @@
 			TowerEnd(e) {
 				let direction = this.direction;
 				let list = this.swiperList;
-				console.log(list);
 				if (direction == 'right') {
 					let mLeft = list[0].mLeft;
 					let zIndex = list[0].zIndex;

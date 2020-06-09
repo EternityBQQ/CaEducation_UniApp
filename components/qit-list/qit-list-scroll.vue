@@ -51,7 +51,7 @@
 		methods: {
 			/*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
 			upCallback(page) {
-				var curPageData = this.courseList || []
+				var curPageData = this.courseList || [];
 				curPageData.forEach(item => {
 					item.discountPrice = (item.discountPrice / 100).toFixed(2)
 					item.salePrice = (item.salePrice / 100).toFixed(2)

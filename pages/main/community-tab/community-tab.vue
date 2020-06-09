@@ -117,24 +117,11 @@
 				articleData: []
 			}
 		},
-		mounted() {
-			var currentData = [];
-			// 从本地获取缓存数据
-			uni.getStorage({
-				key: "education/communityTab?token=community",
-				success: res => {
-					// 封装数据
-					this.hotPost = res.data.hotPost,
-					this.articleData = res.data.posts
-					console.log("社区数据获取成功")
-				}
-			});
-		},
 		methods: {
 			/**
 			 * 页面加载数据
 			 */
-			initPageData() {
+			async initPageData() {
 				// 初始化社区交流信息模块
 				this.$request.sendResuest({
 					url: "education/communityTab",
@@ -151,13 +138,24 @@
 							success: () => {
 								console.log("社区交流模块数据存储成功!");
 							}
-						})
+						});
 					}
 				}, "/pages/main/main.vue");
+				var currentData = [];
+				// 从本地获取缓存数据
+				uni.getStorage({
+					key: "education/communityTab?token=community",
+					success: res => {
+						// 封装数据
+						this.hotPost = res.data.hotPost,
+						this.articleData = res.data.posts
+						console.log("社区数据获取成功")
+					}
+				});
 			},
 			/*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
 			upCallback(page) {
-				console.log("测试: " + this.articleData);
+				this.initPageData();
 				var curPageData = this.articleData || []
 				curPageData.forEach(item => {
 					

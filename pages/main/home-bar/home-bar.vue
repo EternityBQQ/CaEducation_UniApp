@@ -1,7 +1,7 @@
 <template>
 	<view class="index-page">
 		<!--课程列表-->
-		<qit-list-scroll class="pageScroll" :filterCondition="false" :courseList="courseList">
+		<qit-list-scroll class="pageScroll" :filterCondition="false" @getPage="initPageData" :courseList="courseList">
 			<view class="action">
 				<!--轮播图-->
 				<view class="a-swiper-dot-active">
@@ -33,7 +33,7 @@
 </template>
 
 <script>
-	import qitListScroll from '@/components/qit-list/qit-list-scroll.vue'
+	import qitListScroll from '@/components/qit-list/qit-list-scroll.vue';
 	
 	export default {
 		data() {
@@ -65,29 +65,37 @@
 		created() {
 			// 初始化towerSwiper 传已有的数组名即可
 			this.TowerSwiper('swiperList');
-			this.initPageData();
 		},
 		methods: {
 			initPageData: async function() {
+				let _this = this;
 				// 初始化轮播图列表
-				this.$request.sendResuest({
-					url: "education/mediaOutPut",
-					method: "GET",
-					data: {
-						token: ''
-					},
-					hideLoading: true,
-					success: data => {
-						let list = data;
-						uni.setStorage({
-							key:'education/mediaOutPut?token=home',
-							data: list,
-							success:() => {
-								console.log("首页数据获取成功");
-							}
-						});
-					}
-				}, "/pages/main/main.vue");
+				let homePage = uni.getStorageSync("education/mediaOutPut?token=home");
+				if (homePage != "" && homePage != undefined) {
+					await this.getPageStorageData();
+				} else {
+					await this.$request.sendResuest({
+						url: "education/mediaOutPut",
+						method: "GET",
+						data: {
+							token: ''
+						},
+						hideLoading: true,
+						success: data => {
+							let list = data;
+							uni.setStorage({
+								key:'education/mediaOutPut?token=home',
+								data: list,
+								success:() => {
+									console.log("首页数据获取成功");
+								}
+							});
+							this.getPageStorageData();
+						}
+					}, "/pages/main/main.vue");
+				}
+			},
+			async getPageStorageData() {
 				uni.getStorage({
 					key: 'education/mediaOutPut?token=home',
 					success: res => {

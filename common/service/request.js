@@ -53,7 +53,7 @@ const sendResuest = (params, backPage) => {
 		method = 'GET';
 		header = {'content-type' : "application/json"};
 	}
-	new Promise(function(resolve, reject) {
+	return new Promise(function(resolve, reject) {
 		uni.request({
 			url: requestUrl,
 			method: method,
@@ -91,12 +91,14 @@ const sendResuest = (params, backPage) => {
 					});
 					return;
 				}
+				resolve(res.data.responseData);
 				typeof params.success == "function" && params.success(res.data.responseData);
 			},
 			fail: (e) => {
 				uni.showModal({
 					content:"" + e.errMsg
 				});
+				reject(e.data);
 				typeof params.fail == "function" && params.fail(e.data);
 			},
 			complete: () => {

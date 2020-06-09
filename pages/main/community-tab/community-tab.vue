@@ -123,25 +123,32 @@
 			 */
 			async initPageData() {
 				// 初始化社区交流信息模块
-				this.$request.sendResuest({
-					url: "education/communityTab",
-					method: "GET",
-					data: {
-						"pageDataSize": 10
-					},
-					hideLoading: true,
-					success: (data) => {
-						let pageData = data;
-						uni.setStorage({
-							key: 'education/communityTab?token=community',
-							data: pageData,
-							success: () => {
-								console.log("社区交流模块数据存储成功!");
-							}
-						});
-					}
-				}, "/pages/main/main.vue");
-				var currentData = [];
+				let communityPage = uni.getStorageSync("education/communityTab");
+				if (communityPage != "" && communityPage != undefined) {
+					await this.getStoragePageData();
+				} else {
+					await this.$request.sendResuest({
+						url: "education/communityTab",
+						method: "GET",
+						data: {
+							"pageDataSize": 10
+						},
+						hideLoading: true,
+						success: (data) => {
+							let pageData = data;
+							uni.setStorage({
+								key: 'education/communityTab?token=community',
+								data: pageData,
+								success: () => {
+									console.log("社区交流模块数据存储成功!");
+								}
+							});
+							this.getStoragePageData();
+						}
+					}, "/pages/main/main.vue");
+				}
+			},
+			getStoragePageData() {
 				// 从本地获取缓存数据
 				uni.getStorage({
 					key: "education/communityTab?token=community",
@@ -154,11 +161,11 @@
 				});
 			},
 			/*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
-			upCallback(page) {
-				this.initPageData();
+			async upCallback(page) {
+				await this.initPageData();
 				var curPageData = this.articleData || []
 				curPageData.forEach(item => {
-					
+					console.log(item);
 				});
 				this.mescroll.endByPage(curPageData.length, curPageData.pages);
 				this.dataList = this.dataList.concat(curPageData);

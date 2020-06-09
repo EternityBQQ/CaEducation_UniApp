@@ -17,6 +17,7 @@ Vue.prototype.$request = request;
 App.mpType = 'app'
 
 const app = new Vue({
+	// 挂载
 	store,
 	...App
 })

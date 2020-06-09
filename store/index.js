@@ -10,7 +10,10 @@ const store = new Vuex.Store({
 		 */
 		forcedLogin: false,
 		hasLogin: true,
-		userName: ""
+		userName: "",
+		
+		// 首页数据
+		homePage: [],
 	},
 	mutations: {
 		login(state, userName) {
@@ -20,8 +23,12 @@ const store = new Vuex.Store({
 		logout(state) {
 			state.userName = "";
 			state.hasLogin = false;
+		},
+		setHomePage(state, pageData) {
+			state.homePage = pageData;
 		}
-	}
+	},
+	actions: {}
 })
 
 export default store

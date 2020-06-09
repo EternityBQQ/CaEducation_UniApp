@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === 'development') {
 	url_config = 'http://39.97.231.147:8080/'
 } else {
 	// 生产环境
-	url_config = 'http://24t592x186.wicp.vip/'
+	url_config = 'http://39.97.231.147:8080/'
 }
 
 export default url_config;

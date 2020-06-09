@@ -10,13 +10,13 @@
 					<home-bar v-if="showHome" ref="homeBar"></home-bar>
 				</swiper-item>
 				<swiper-item>
-					<cate-tab v-if="showCate"></cate-tab>
+					<cate-tab v-if="showCate" ref="communityTab"></cate-tab>
 				</swiper-item>
 				<swiper-item>
-					<car-tab v-if="showShopCar"></car-tab>
+					<car-tab v-if="showShopCar" ref="mineCourse"></car-tab>
 				</swiper-item>
 				<swiper-item @touchmove="touchToPrevent">
-					<mine-center v-if="showMine"></mine-center>
+					<mine-center v-if="showMine" ref="mineCenter"></mine-center>
 				</swiper-item>
 			</swiper>
 		</view>
@@ -153,9 +153,11 @@
 			},
 			// 监听手势滑动切换页面
 			bindChange(e) {
-				console.log(this.$refs.homeBar.swiperList)
 				this.currentIndex = e.detail.current;
-				this.changePage(this.currentIndex);
+				// 如果是滑动,还需要切换页面数据
+				if (this.listTouchDirection) {
+					this.changePage(this.currentIndex);
+				}
 			},
 			showModal(e) {
 				this.modalName = e.currentTarget.dataset.target
@@ -171,6 +173,10 @@
 					this.mineFlag = false;
 				} else {
 					this.mineFlag = true;
+				}
+				// 首次加载,获取页面数据
+				if (index == 1 && this.$refs.communityTab) {
+					this.$refs.communityTab.initPageData();
 				}
 			}
 		}

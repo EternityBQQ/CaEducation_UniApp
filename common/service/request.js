@@ -1,6 +1,9 @@
 import configUrl from './config.js'
 const baseUrl = configUrl;
 
+/**
+ * 异步请求
+ */
 const sendResuest = (params, backPage) => {
 	// 拼接完整请求地址
 	var requestUrl = baseUrl + params.url;
@@ -106,4 +109,21 @@ const sendResuest = (params, backPage) => {
 	});
 }
 
-export default {sendResuest};
+// 同步请求
+const sendSyncRequest = (params) => {
+	var requestUrl = baseUrl + params.url;
+	return new Promise((resolve, reject) => {
+		uni.request({
+			url: requestUrl,
+			success: (res) => {
+				console.log(res.data.responseData)
+				resolve("success");
+			},
+			fail: (err) => {
+				reject('error')
+			}
+		})
+	});
+}
+
+export default {sendResuest, sendSyncRequest};

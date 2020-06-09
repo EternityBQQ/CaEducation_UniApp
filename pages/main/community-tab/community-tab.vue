@@ -8,7 +8,7 @@
 			:up="upOption" @up="upCallback" 
 			@emptyclick="emptyClick">
 			<!--标题文章-->
-			<view class="cu-card dynamic" :class="isCard?'no-card':''">
+			<view class="cu-card dynamic" :class="isCard?'no-card':''" v-if="hotPost">
 				<view class="cu-item shadow">
 					<view class="cu-list menu-avatar">
 						<view class="cu-item">
@@ -85,7 +85,7 @@
 				</view>
 			</view>
 			<!--论坛文章-->
-			<view class="cu-card article" :class="isCard?'no-card':''" v-for="(item, index) in articleData" :key="index">
+			<view class="cu-card article" :class="isCard?'no-card':''" v-if="articleData[0]" v-for="(item, index) in articleData" :key="index">
 				<view class="cu-item shadow">
 					<view class="title"><view class="text-cut">{{item.title}}</view></view>
 					<view class="content">
@@ -93,8 +93,9 @@
 						<view class="desc">
 							<view class="text-content">{{item.post_content}}</view>
 							<view>
-								<view class="cu-tag bg-red light sm round">正义天使</view>
-								<view class="cu-tag bg-green light sm round">史诗</view>
+								<view :class="'cu-tag bg-green light sm round'" v-for="(tag, index) in item.tags" :key="index">
+									{{tag}}
+								</view>
 							</view>
 						</view>
 					</view>
@@ -116,26 +117,8 @@
 				articleData: []
 			}
 		},
-		created() {
-			// 初始化社区交流信息模块
-			this.$request.sendResuest({
-				url: "education/communityTab",
-				method: "GET",
-				data: {
-					"pageDataSize": 10
-				},
-				hideLoading: true,
-				success: (data) => {
-					let pageData = data;
-					uni.setStorage({
-						key: 'education/communityTab?token=community',
-						data: pageData,
-						success: () => {
-							console.log("社区交流模块数据存储成功!");
-						}
-					})
-				}
-			}, "/pages/main/main.vue");
+		mounted() {
+			var currentData = [];
 			// 从本地获取缓存数据
 			uni.getStorage({
 				key: "education/communityTab?token=community",
@@ -143,19 +126,38 @@
 					// 封装数据
 					this.hotPost = res.data.hotPost,
 					this.articleData = res.data.posts
+					console.log("社区数据获取成功")
 				}
-			})
-		},
-		mounted() {
-			var currentData = [];
-			for (var i = 0; i < 5; i++) {
-				currentData.push(i);
-			}
-			this.articleData = this.articleData.concat(currentData);
+			});
 		},
 		methods: {
+			/**
+			 * 页面加载数据
+			 */
+			initPageData() {
+				// 初始化社区交流信息模块
+				this.$request.sendResuest({
+					url: "education/communityTab",
+					method: "GET",
+					data: {
+						"pageDataSize": 10
+					},
+					hideLoading: true,
+					success: (data) => {
+						let pageData = data;
+						uni.setStorage({
+							key: 'education/communityTab?token=community',
+							data: pageData,
+							success: () => {
+								console.log("社区交流模块数据存储成功!");
+							}
+						})
+					}
+				}, "/pages/main/main.vue");
+			},
 			/*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
 			upCallback(page) {
+				console.log("测试: " + this.articleData);
 				var curPageData = this.articleData || []
 				curPageData.forEach(item => {
 					
@@ -166,7 +168,7 @@
 					this.mescroll.showEmpty()
 				}
 			},
-		},
+		}
 	}
 </script>
 

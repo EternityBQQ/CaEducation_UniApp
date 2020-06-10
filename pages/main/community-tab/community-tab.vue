@@ -6,7 +6,8 @@
 			top="0" 
 			:down="downOption" @down="downCallback" 
 			:up="upOption" @up="upCallback" 
-			@emptyclick="emptyClick">
+			@emptyclick="emptyClick"
+			v-if="articleData[0]">
 			<!--标题文章-->
 			<view class="cu-card dynamic" :class="isCard?'no-card':''" v-if="hotPost">
 				<view class="cu-item shadow">
@@ -117,38 +118,39 @@
 				articleData: []
 			}
 		},
+		async created() {
+			await this.getStoragePageData();
+		},
 		methods: {
 			/**
 			 * 页面加载数据
 			 */
 			async initPageData() {
 				// 初始化社区交流信息模块
-				let communityPage = uni.getStorageSync("education/communityTab");
-				if (communityPage != "" && communityPage != undefined) {
-					await this.getStoragePageData();
-				} else {
-					await this.$request.sendResuest({
-						url: "education/communityTab",
-						method: "GET",
-						data: {
-							"pageDataSize": 10
-						},
-						hideLoading: true,
-						success: (data) => {
-							let pageData = data;
-							uni.setStorage({
-								key: 'education/communityTab?token=community',
-								data: pageData,
-								success: () => {
-									console.log("社区交流模块数据存储成功!");
-								}
-							});
-							this.getStoragePageData();
-						}
-					}, "/pages/main/main.vue");
-				}
+				await this.$request.sendResuest({
+					url: "education/communityTab",
+					method: "GET",
+					data: {
+						"pageDataSize": 10
+					},
+					hideLoading: true,
+					success: (data) => {
+						let pageData = data;
+						uni.setStorage({
+							key: 'education/communityTab?token=community',
+							data: pageData,
+							success: () => {
+								console.log("社区交流模块数据存储成功!");
+							}
+						});
+					}
+				}, "/pages/main/main.vue");
 			},
-			getStoragePageData() {
+			async getStoragePageData() {
+				var isExistKey = uni.getStorageSync("education/communityTab?token=community");
+				if (isExistKey == "") {
+					await this.initPageData();
+				}
 				// 从本地获取缓存数据
 				uni.getStorage({
 					key: "education/communityTab?token=community",
@@ -156,16 +158,14 @@
 						// 封装数据
 						this.hotPost = res.data.hotPost,
 						this.articleData = res.data.posts
-						console.log("社区数据获取成功")
 					}
 				});
 			},
 			/*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
-			async upCallback(page) {
-				await this.initPageData();
-				var curPageData = this.articleData || []
+			upCallback(page) {
+				var curPageData = this.articleData || [];
 				curPageData.forEach(item => {
-					console.log(item);
+					// 单独处理代码
 				});
 				this.mescroll.endByPage(curPageData.length, curPageData.pages);
 				this.dataList = this.dataList.concat(curPageData);

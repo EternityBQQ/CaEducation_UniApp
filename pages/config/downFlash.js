@@ -22,7 +22,9 @@ const downFlash = {
 		}
 	},
 	mounted() {
-		this.mescroll.triggerDownScroll();
+		if (this.mescroll) {
+			this.mescroll.triggerDownScroll();
+		}
 	},
 	methods: {
 		// mescroll组件初始化的回调,可获取到mescroll对象

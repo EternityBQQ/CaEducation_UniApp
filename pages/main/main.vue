@@ -43,9 +43,6 @@
 </template>
 
 <script>
-	import {
-		mapState
-	} from 'vuex';
 	import topBar from '../components/top-bar/top-bar.vue';
 	import rootBar from '../components/root-bar/root-bar.vue';
 	import homeBar from './home-bar/home-bar.vue';
